@@ -23,6 +23,6 @@
     background-color: var(--success);
 }
 
-.danger {
+.error {
     background-color: var(--danger);
 }

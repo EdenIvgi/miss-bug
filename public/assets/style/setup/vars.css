@@ -2,16 +2,13 @@
     --bg1: darkcyan;
     --bg2: rgb(50, 165, 204);
     --bg3: darkmagenta;
-
-    --clr-txt-light: whitesmoke;
-    --clr-txt-dark: #222;
     
     --color1: aliceblue;
     --color2: lightblue;
     --color3: gold;
     --color4: goldenrod;
     
-    --gray1: darkgray;
+    --gray1: #444;
     --gray2: lightgray;
     
     --success: green;

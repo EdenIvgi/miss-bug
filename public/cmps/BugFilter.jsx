@@ -15,11 +15,14 @@ export function BugFilter({ filterBy, onSetFilterBy }) {
         switch (target.type) {
             case 'number':
             case 'range':
-                value = +value
+                value = +value || ''
                 break
 
             case 'checkbox':
                 value = target.checked
+                break
+
+            default:
                 break
         }
 
@@ -33,14 +36,15 @@ export function BugFilter({ filterBy, onSetFilterBy }) {
 
     const { txt, minSeverity } = filterByToEdit
     return (
-        <form className="bug-filter" onSubmit={onSubmitFilter}>
-            <p>Filter</p>
+        <section className="bug-filter">
+            <h2>Filter</h2>
+            <form onSubmit={onSubmitFilter}>
+                <label htmlFor="txt">Text: </label>
+                <input value={txt} onChange={handleChange} type="text" placeholder="By Text" id="txt" name="txt" />
 
-            <label htmlFor="txt">Text: </label>
-            <input value={txt} onChange={handleChange} type="text" placeholder="Search title / desc." id="txt" name="txt" />
-
-            <label htmlFor="minSeverity">Min Severity: </label>
-            <input value={minSeverity || ''} onChange={handleChange} type="number" placeholder="By Min Severity" id="minSeverity" name="minSeverity" />
-        </form>
+                <label htmlFor="minSeverity">Min Severity: </label>
+                <input value={minSeverity} onChange={handleChange} type="number" placeholder="By Min Severity" id="minSeverity" name="minSeverity" />
+            </form>
+        </section>
     )
 }

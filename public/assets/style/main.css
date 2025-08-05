@@ -3,10 +3,10 @@
 @import './setup/base.css';
 @import './setup/layout.css';
 
-@import './pages/Home.css';
-@import './pages/AboutUs.css';
-@import './pages/BugIndex.css';
-@import './pages/BugDetails.css';
+@import './cmps/Home.css';
+@import './cmps/AboutUs.css';
+@import './cmps/BugIndex.css';
+@import './cmps/BugDetails.css';
 
 @import './cmps/AppHeader.css';
 @import './cmps/AppFooter.css';
