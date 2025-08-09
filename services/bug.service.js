@@ -7,13 +7,55 @@ export const bugService = {
     query,
     getById,
     remove,
-    save
+    save,
+    getEmptyBug,
+    getTotalCount
 }
 
 const bugs = utilService.readJsonFile('data/bug.json')
 
-function query() {
-    return Promise.resolve(bugs)
+const BUGS_PER_PAGE = 4
+let totalPages = null
+
+function query(filter, sort, page) {
+
+    let filteredBugs = bugs
+    // FILTER
+    if (filter.minSeverity) {
+        filteredBugs = filteredBugs.filter(bug => bug.severity >= filter.minSeverity)
+    }
+
+    if (filter.txt) {
+        const regex = new RegExp(filter.txt, 'i')
+        filteredBugs = filteredBugs.filter(bug => regex.test(bug.title)
+            || regex.test(bug.description)
+            || bug.labels.some(label => regex.test(label)))
+    }
+
+    if (sort.sortBy) {
+        ['severity', 'createdAt'].includes(sort.sortBy)
+            ? filteredBugs.sort((a, b) =>
+                (a[sort.sortBy] - b[sort.sortBy]) * sort.sortDir)
+            : filteredBugs.sort((a, b) =>
+                a[sort.sortBy].localeCompare(b[sort.sortBy] * sort.sortDir))
+
+    }
+
+
+    totalPages = Math.floor(filteredBugs.length / BUGS_PER_PAGE)
+    let pageIdx = page.pageIdx
+
+    if (pageIdx < 0) pageIdx = totalPages - 1
+    if (pageIdx >= totalPages) pageIdx = 0
+
+    let startIdx = pageIdx * BUGS_PER_PAGE
+    const endIdx = startIdx + BUGS_PER_PAGE
+
+    filteredBugs = filteredBugs.slice(startIdx, endIdx)
+
+
+
+    return Promise.resolve(filteredBugs)
 }
 
 function getById(bugId) {
@@ -37,7 +79,7 @@ function save(bug) {
         // bugs[idx] = bug 
     } else {
         bug._id = utilService.makeId()
-        bug.createdAt = Date.now()
+        // bug.createdAt = Date.now()
         bugs.unshift(bug)
     }
     return _saveBugsToFile().then(() => bug)
@@ -55,5 +97,21 @@ function _saveBugsToFile() {
             resolve()
         });
     })
+}
+
+function getTotalCount() {
+    return Promise.resolve(totalPages)
+}
+
+function getEmptyBug({ title, description, severity, labels }) {
+    return {
+
+        title: title || '',
+        description: description || '',
+        severity: severity || '',
+        createdAt: Date.now(),
+        labels: labels || []
+    }
+
 }
 
