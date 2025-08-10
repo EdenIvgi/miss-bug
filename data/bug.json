@@ -1,5 +1,13 @@
 [
   {
+    "title": "Bug 1754838716926",
+    "description": "",
+    "severity": 3,
+    "createdAt": 1754838720327,
+    "labels": [],
+    "_id": "xhWq3"
+  },
+  {
     "title": "Bug 1754239710841",
     "description": "desc",
     "severity": 4,

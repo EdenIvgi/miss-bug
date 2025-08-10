@@ -26,8 +26,8 @@ app.use(express.json())
 // List
 app.get('/api/bug', (req, res) => {
     const { txt, sortBy, sortDir, pageIdx, minSeverity } = req.query
- 
-    
+
+
 
     const filter = {
         txt: txt || '',

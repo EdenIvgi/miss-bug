@@ -1,4 +1,3 @@
-
 const BASE_URL = '/api/bug/'
 
 export const bugService = {
@@ -6,25 +5,14 @@ export const bugService = {
     getById,
     save,
     remove,
-    getDefaultFilter
+    getDefaultFilter,
+    getTotalBugs
 }
 
 function query(filterBy) {
-    return axios.get(BASE_URL)
-        .then(res => res.data)
-        .then(bugs => {
+    return axios.get(BASE_URL, { params: filterBy })
+        .then(res => res.data).catch(console.error)
 
-            if (filterBy.txt) {
-                const regExp = new RegExp(filterBy.txt, 'i')
-                bugs = bugs.filter(bug => regExp.test(bug.title))
-            }
-
-            if (filterBy.minSeverity) {
-                bugs = bugs.filter(bug => bug.severity >= filterBy.minSeverity)
-            }
-
-            return bugs
-        })
 }
 
 function getById(bugId) {
@@ -33,23 +21,30 @@ function getById(bugId) {
 }
 
 function remove(bugId) {
-    const url = BASE_URL + bugId + '/remove'
-    console.log(url)
-
-    return axios.get(url)
+    return axios.delete(BASE_URL + bugId)
+        .then(res => res.data).catch(console.error)
 }
 
 function save(bug) {
+    console.log(bug);
+    
+    
 
-    var queryParmas = `?title=${bug.title}&description=${bug.description}&severity=${bug.severity}`
-    if (bug._id) queryParmas += `&_id=${bug._id}`
-    console.log(queryParmas);
-
-    return axios.get(BASE_URL + 'save/' + queryParmas).then(res => res.data)
+    if (bug._id) {
+        return axios.put(BASE_URL, bug).then(res => res.data)
+            .catch(console.error)
+    } else {
+        return axios.post(BASE_URL, bug).then(res => res.data).catch(console.error)
+    }
 }
 
 
 
 function getDefaultFilter() {
-    return { txt: '', minSeverity: 0 }
+    return { txt: '', minSeverity: 0 ,pageIdx: 0, sortBy: '', sortDir: -1}
+}
+
+function getTotalBugs(){
+    return axios.get(BASE_URL+'totalBugs')
+        .then(res => res.data)
 }

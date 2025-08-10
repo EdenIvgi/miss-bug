@@ -10,3 +10,13 @@
 9.8.2025, 13:14:16 - ERROR - Cannot get bug | Bug not found!
 9.8.2025, 13:44:33 - ERROR - Cannot get bug | Bug not found!
 9.8.2025, 13:44:54 - ERROR - Cannot get bug | Bug not found!
+9.8.2025, 13:46:54 - INFO - Server listening on port http://localhost:3030/
+9.8.2025, 13:47:07 - ERROR - Cannot get bug | Bug not found!
+9.8.2025, 14:07:42 - ERROR - Cannot get bug | Bug not found!
+9.8.2025, 14:08:26 - ERROR - Cannot get bug | Bug not found!
+10.8.2025, 13:36:55 - INFO - Server listening on port http://localhost:3030/
+10.8.2025, 13:37:48 - ERROR - Cannot get bug | Bug not found!
+10.8.2025, 13:43:29 - ERROR - Cannot get bug | Bug not found!
+10.8.2025, 13:45:57 - ERROR - Cannot get bug | Bug not found!
+10.8.2025, 18:11:40 - INFO - Server listening on port http://localhost:3030/
+10.8.2025, 18:12:00 - DEBUG - req.body | {"title":"Bug 1754838716926","severity":3,"description":""}

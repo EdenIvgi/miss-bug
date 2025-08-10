@@ -44,6 +44,22 @@ export function BugFilter({ filterBy, onSetFilterBy }) {
 
                 <label htmlFor="minSeverity">Min Severity: </label>
                 <input value={minSeverity} onChange={handleChange} type="number" placeholder="By Min Severity" id="minSeverity" name="minSeverity" />
+
+                <label htmlFor="sortBy">Sort By: </label>
+                <select id="sortBy" name="sortBy" onChange={handleChange}>
+                    <option value="">Select</option>
+                    <option value="severity">Severity</option>
+                    <option value="createdAt">Created At</option>
+                    <option value="title">Title</option>
+                    <option value="description">Description</option>
+                </select>
+
+                <label htmlFor="sortDir">Sort Direction: </label>
+                <select id="sortDir" name="sortDir" onChange={handleChange}>
+                    <option value="">Select</option>
+                    <option value="1">Ascending</option>
+                    <option value="-1">Descending</option>
+                </select>
             </form>
         </section>
     )

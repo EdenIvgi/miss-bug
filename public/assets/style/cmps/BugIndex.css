@@ -6,3 +6,9 @@
     padding-block: 1em;
     border-block-end: 1px solid lightgray;
 }
+
+button:disabled {
+    background-color: lightgray;
+    color: darkgray;
+    cursor: not-allowed;
+}

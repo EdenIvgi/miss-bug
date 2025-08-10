@@ -5,17 +5,34 @@ import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 
 import { BugFilter } from '../cmps/BugFilter.jsx'
 import { BugList } from '../cmps/BugList.jsx'
+import { use } from 'react'
 
 export function BugIndex() {
     const [bugs, setBugs] = useState(null)
+    const [totalCount, setTotalCount] = useState(null)
     const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
 
-    useEffect(loadBugs, [filterBy])
+    useEffect(() => {
+        loadBugs()
+        getTotalCount()
+    }, [filterBy])
 
     function loadBugs() {
         bugService.query(filterBy)
             .then(setBugs)
             .catch(err => showErrorMsg(`Couldn't load bugs - ${err}`))
+    }
+
+    function getTotalCount() {
+        bugService.getTotalBugs().then((count) => {
+            const buttons = []
+            buttons.length = count
+            buttons.fill({ disabled: false }, 0, count)
+            console.log('Total count:', buttons);
+
+            setTotalCount(buttons)
+        }).catch(err => showErrorMsg(`Couldn't get total count - ${err}`))
+
     }
 
     function onRemoveBug(bugId) {
@@ -47,6 +64,7 @@ export function BugIndex() {
         const severity = +prompt('New severity?', bug.severity)
         const bugToSave = { ...bug, severity }
 
+        debugger
         bugService.save(bugToSave)
             .then(savedBug => {
                 const bugsToUpdate = bugs.map(currBug =>
@@ -62,6 +80,16 @@ export function BugIndex() {
         setFilterBy(prevFilter => ({ ...prevFilter, ...filterBy }))
     }
 
+    function onChangePage(idx) {
+        setFilterBy(prevFilter => {
+            return { ...prevFilter, pageIdx: idx }
+        })
+    }
+
+    function onDownloadBugs() {
+        window.open('http://localhost:3030/file/pdf', '_blank')
+    }
+
     return <section className="bug-index main-content">
 
         <BugFilter filterBy={filterBy} onSetFilterBy={onSetFilterBy} />
@@ -74,5 +102,20 @@ export function BugIndex() {
             bugs={bugs}
             onRemoveBug={onRemoveBug}
             onEditBug={onEditBug} />
+
+        <div>
+            <button onClick={onDownloadBugs}>Download</button>
+        </div>
+
+        {totalCount && <footer>
+            <div>
+                {totalCount.map((btn, idx) => (
+                    <button onClick={() => onChangePage(idx)}
+                        key={idx} className={`page-btn ${btn.disabled ? 'disabled' : ''}`}>
+                        {idx + 1}
+                    </button>
+                ))}
+            </div>
+        </footer>}
     </section>
 }
