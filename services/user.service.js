@@ -1,5 +1,4 @@
 import fs from 'fs'
-
 import { utilService } from './util.service.js'
 
 const users = utilService.readJsonFile('data/user.json')
@@ -25,7 +24,7 @@ function signup({ fullname, username, password }) {
     if (!fullname || !username || !password) {
         return Promise.reject('Incomplete credentials')
     }
-    
+
     const user = {
         _id: utilService.makeId(),
         fullname,

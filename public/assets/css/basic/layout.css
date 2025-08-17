@@ -1,0 +1,14 @@
+.main-layout {
+    padding-inline: 15vw;
+}
+
+.paging {
+    width: 200px;
+    margin-block-start: 1rem;
+    justify-content: space-between;
+}
+
+.paging span {
+    font-weight: 500;
+    color: var(--primary-color);
+}

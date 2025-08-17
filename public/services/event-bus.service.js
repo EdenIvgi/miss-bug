@@ -1,30 +1,45 @@
-export const eventBusService = createEventEmitter()
-
-export function showUserMsg(msg) {
-    eventBusService.emit('show-user-msg', msg)
+export function showUserMsg(txt, type = '') {
+  eventBusService.emit('show-user-msg', { txt, type })
 }
-
 export function showSuccessMsg(txt) {
-    showUserMsg({ txt, type: 'success' })
+  showUserMsg(txt, 'success')
+}
+export function showErrorMsg(txt) {
+  showUserMsg(txt, 'error')
 }
 
-export function showErrorMsg(txt, err) {
-    showUserMsg({ txt: `${txt}: ${err}`, type: 'error' })
-    if (err) console.log(`${txt}\n`, err)
+export const eventBusService = { on, emit }
+
+function on(eventName, listener) {
+  const callListener = ({ detail }) => {
+    listener(detail)
+  }
+  window.addEventListener(eventName, callListener)
+  return () => {
+    window.removeEventListener(eventName, callListener)
+  }
 }
 
-function createEventEmitter() {
-    const listenersMap = {}
-    return {
-        on(evName, listener) {
-            listenersMap[evName] = (listenersMap[evName]) ? [...listenersMap[evName], listener] : [listener]
-            return () => {
-                listenersMap[evName] = listenersMap[evName].filter(func => func !== listener)
-            }
-        },
-        emit(evName, data) {
-            if (!listenersMap[evName]) return
-            listenersMap[evName].forEach(listener => listener(data))
-        }
-    }
+function emit(eventName, data) {
+  window.dispatchEvent(new CustomEvent(eventName, { detail: data }))
 }
+
+window.myBus = eventBusService
+window.showUserMsg = showUserMsg
+
+// eventBusService.on('baba', (x)=>console.log('Hi Baba', x))
+// eventBusService.on('baba', (x)=>console.log('Hello Baba Ji', x))
+// eventBusService.emit('baba', [5, 8, 11])
+// setTimeout(()=>{
+//     eventBusService.emit('baba', 17)
+// }, 2000)
+
+/* Listening Component...
+    import {eventBusService} from 'path...event-bus-service'
+    eventBusService.on('some-event', (dataFromEvent) => {
+    do something with dataFromEvent
+    })
+
+   Receiving Component...
+    eventBusService.emit('some-event', data)
+*/

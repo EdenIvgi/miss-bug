@@ -1,34 +1,28 @@
-import PDFDocument from 'pdfkit'
 import fs from 'fs'
-import { bugService } from './bug.service.js';
-import { utilService } from './util.service.js'
-
-const bugs = utilService.readJsonFile('data/bug.json')
-
-function createPdf() {
-
-    //   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument();
-    const writeStream = fs.createWriteStream('output.pdf');
-
-    doc.pipe(writeStream);
-
-    doc
-        .fontSize(25)
-        .text('Some text with an embedded font!', 100, 100);
-
-
-
-    // const bugs = utilService.readJsonFile('data/bug.json')
-
-    doc
-        .addPage()
-        .fontSize(14)
-        .text(JSON.stringify(bugs, null, 2), 100, 100);
-    doc.end();
-
-}
+import PDFDocument from 'pdfkit'
 
 export const pdfService = {
-    createPdf
+    buildBugsPDF
+}
+
+
+function buildBugsPDF(bugs, filename = 'SaveTheBugs.pdf') {
+    const doc = new PDFDocument()
+
+
+    // Pipe its output somewhere, like to a file or HTTP response
+    doc.pipe(fs.createWriteStream(filename))
+
+    // iterate bugs array, and create a pdf with all the bugs
+    bugs.forEach(bug => {
+        // doc.font('./fonts/roboto.ttf')
+        doc.text(`Bug ID: ${bug._id}`)
+        doc.text(`Title: ${bug.title}`)
+        doc.text(`Description: ${bug.description}`)
+        doc.text(`Severity: ${bug.severity}`)
+        doc.addPage()
+    })
+
+    // finalize PDF file
+    doc.end()
 }

@@ -23,3 +23,6 @@
 10.8.2025, 18:22:37 - DEBUG - req.body | {"_id":"bug011","title":"File upload fails","description":"Only images smaller than 1MB allowed, error not shown","severity":0,"createdAt":1632107359454,"labels":["upload","validation"]}
 11.8.2025, 12:47:24 - INFO - Server listening on port http://localhost:3030/
 11.8.2025, 17:02:17 - DEBUG - req.body | {"title":"Bug 1754838716926","description":"","severity":1,"createdAt":1754838720327,"labels":[],"_id":"xhWq3"}
+17.8.2025, 12:54:13 - INFO - Server listening on port http://localhost:3030/
+17.8.2025, 13:14:51 - INFO - Server listening on port http://127.0.0.1:3030/
+17.8.2025, 14:03:33 - INFO - Server listening on port http://127.0.0.1:3030/

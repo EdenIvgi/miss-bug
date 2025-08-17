@@ -1,26 +1,33 @@
-const { useState, useEffect, useRef } = React
 import { eventBusService } from '../services/event-bus.service.js'
+const { useState, useEffect } = React
 
 export function UserMsg() {
-	const [msg, setMsg] = useState()
-	const timeoutIdRef = useRef()
+  const [msg, setMsg] = useState(null)
 
-	useEffect(() => {
-		const unsubscribe = eventBusService.on('show-user-msg', msg => {
-			setMsg(msg)
-            clearTimeout(timeoutIdRef.current)
-			timeoutIdRef.current = setTimeout(closeMsg, 2000)
-		})
-		return unsubscribe
-	}, [])
-    
-	function closeMsg() {
-		setMsg(null)
-	}
+  useEffect(() => {
+    // Here we listen to the event that we emited, its important to remove the listener
+    const removeEvent = eventBusService.on('show-user-msg', msg => {
+      setMsg(msg)
+      setTimeout(() => {
+        setMsg(null)
+      }, 5000)
+    })
 
-	if (!msg) return <div></div>
-	return <section className={`user-msg ${msg.type}`}>
-        <span>{msg.txt}</span>
-        <button onClick={closeMsg}>x</button>
+    return () => removeEvent()
+  }, [])
+
+  if (!msg || !msg.txt) return <span></span>
+  const msgClass = msg.type || ''
+  return (
+    <section className={'user-msg ' + msgClass}>
+      <button
+        onClick={() => {
+          setMsg(null)
+        }}
+      >
+        x
+      </button>
+      {msg.txt}
     </section>
+  )
 }

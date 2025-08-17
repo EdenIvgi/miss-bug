@@ -1,121 +1,98 @@
 const { useState, useEffect } = React
-
-import { bugService } from '../services/bug.service.remote.js'
-import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
+const { Link, useNavigate } = ReactRouterDOM
 
 import { BugFilter } from '../cmps/BugFilter.jsx'
 import { BugList } from '../cmps/BugList.jsx'
-import { use } from 'react'
+import { BugSort } from '../cmps/BugSort.jsx'
+import { bugService } from '../services/bug.service.js'
+import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js'
 
 export function BugIndex() {
-    const [bugs, setBugs] = useState(null)
-    const [totalCount, setTotalCount] = useState(null)
+    const [bugs, setBugs] = useState([])
     const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
+    const [sortBy, setSortBy] = useState({ type: '', desc: 1 })
+    const [maxPage, setMaxPage] = useState(null)
 
     useEffect(() => {
         loadBugs()
-        getTotalCount()
-    }, [filterBy])
+    }, [filterBy, sortBy])
 
     function loadBugs() {
-        bugService.query(filterBy)
-            .then(setBugs)
-            .catch(err => showErrorMsg(`Couldn't load bugs - ${err}`))
+        bugService.query(filterBy, sortBy)
+            .then(({ bugs, maxPage }) => {
+                setBugs(bugs)
+                setMaxPage(maxPage)
+            })
+            .catch(err => {
+                console.log('Cannot load bugs:', err)
+                showErrorMsg('Cannot load bugs')
+            })
     }
 
-    function getTotalCount() {
-        bugService.getTotalBugs().then((count) => {
-            const buttons = []
-            buttons.length = count
-            buttons.fill({ disabled: false }, 0, count)
-            console.log('Total count:', buttons);
-
-            setTotalCount(buttons)
-        }).catch(err => showErrorMsg(`Couldn't get total count - ${err}`))
-
+    function onSetFilter(filterBy) {
+        setFilterBy(prevFilter => ({ ...prevFilter, ...filterBy }))
     }
 
     function onRemoveBug(bugId) {
         bugService.remove(bugId)
             .then(() => {
-                const bugsToUpdate = bugs.filter(bug => bug._id !== bugId)
-                setBugs(bugsToUpdate)
+                console.log('Deleted Successfully!')
+                setBugs(prevBugs => prevBugs.filter(bug => bug._id !== bugId))
                 showSuccessMsg('Bug removed')
             })
-            .catch((err) => showErrorMsg(`Cannot remove bug`, err))
-    }
-
-    function onAddBug() {
-        const bug = {
-            title: prompt('Bug title?', 'Bug ' + Date.now()),
-            severity: +prompt('Bug severity?', 3),
-            description: prompt('Bug description?')
-        }
-
-        bugService.save(bug)
-            .then(savedBug => {
-                setBugs([...bugs, savedBug])
-                showSuccessMsg('Bug added')
+            .catch(err => {
+                console.log('from remove bug', err)
+                showErrorMsg('Cannot remove bug')
             })
-            .catch(err => showErrorMsg(`Cannot add bug`, err))
     }
 
-    function onEditBug(bug) {
-        const severity = +prompt('New severity?', bug.severity)
-        const bugToSave = { ...bug, severity }
 
-        debugger
-        bugService.save(bugToSave)
-            .then(savedBug => {
-                const bugsToUpdate = bugs.map(currBug =>
-                    currBug._id === savedBug._id ? savedBug : currBug)
-
-                setBugs(bugsToUpdate)
-                showSuccessMsg('Bug updated')
-            })
-            .catch(err => showErrorMsg('Cannot update bug', err))
+    function onSetSort(sortBy) {
+        setSortBy(prevSort => ({ ...prevSort, ...sortBy }))
     }
 
-    function onSetFilterBy(filterBy) {
-        setFilterBy(prevFilter => ({ ...prevFilter, ...filterBy }))
-    }
-
-    function onChangePage(idx) {
+    function onChangePageIdx(diff) {
         setFilterBy(prevFilter => {
-            return { ...prevFilter, pageIdx: idx }
+            let newPageIdx = prevFilter.pageIdx + diff
+            if (newPageIdx < 0) newPageIdx = 0
+            if (newPageIdx >= maxPage) newPageIdx = maxPage - 1
+            return { ...prevFilter, pageIdx: newPageIdx }
         })
     }
 
-    function onDownloadBugs() {
-        window.open('http://localhost:3030/file/pdf', '_blank')
+    function onDownloadBudsPdf() {
+        bugService.downloadBudsPdf().then(() => {
+            showSuccessMsg(`Bugs PDF download!`)
+        })
     }
 
-    return <section className="bug-index main-content">
+    return (
+        <section className="main-layout">
+            <BugFilter onSetFilter={onSetFilter} filterBy={filterBy} />
+            <BugSort onSetSort={onSetSort} sortBy={sortBy} />
+            <Link to="/bug/edit" className="btn">
+                Add Bug ⛐
+            </Link>
+            <button className="btn-download" onClick={onDownloadBudsPdf}>
+                Download PDF
+            </button>
 
-        <BugFilter filterBy={filterBy} onSetFilterBy={onSetFilterBy} />
-        <header>
-            <h3>Bug List</h3>
-            <button onClick={onAddBug}>Add Bug</button>
-        </header>
-
-        <BugList
-            bugs={bugs}
-            onRemoveBug={onRemoveBug}
-            onEditBug={onEditBug} />
-
-        <div>
-            <button onClick={onDownloadBugs}>Download</button>
-        </div>
-
-        {totalCount && <footer>
-            <div>
-                {totalCount.map((btn, idx) => (
-                    <button onClick={() => onChangePage(idx)}
-                        key={idx} className={`page-btn ${btn.disabled ? 'disabled' : ''}`}>
-                        {idx + 1}
-                    </button>
-                ))}
+            <BugList pageIdx={filterBy.pageIdx} bugs={bugs} onRemoveBug={onRemoveBug} />
+            <div className="paging flex">
+                <button
+                    className="btn"
+                    onClick={() => onChangePageIdx(-1)}
+                >
+                    Previous
+                </button>
+                <span>{filterBy.pageIdx + 1}</span>
+                <button
+                    className="btn"
+                    onClick={() => onChangePageIdx(1)}
+                >
+                    Next
+                </button>
             </div>
-        </footer>}
-    </section>
+        </section>
+    )
 }

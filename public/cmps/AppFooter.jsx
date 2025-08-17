@@ -1,7 +1,7 @@
-export function AppFooter () {
-    const year = (new Date).getFullYear()
-
-    return <footer className="main-content">
-        <p>coffeerights &copy; {year}</p>
+export function AppFooter() {
+  return (
+    <footer className="flex center ">
+      <p>&copy; Coffeerights Coding Academy 2023</p>
     </footer>
+  )
 }
