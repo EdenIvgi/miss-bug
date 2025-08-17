@@ -99,7 +99,7 @@ function _saveBugsToFile() {
     })
 }
 
-function getTotalCount(){
+function getTotalCount() {
     return Promise.resolve(totalPages)
 }
 
